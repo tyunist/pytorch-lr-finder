@@ -4,9 +4,10 @@ import torch
 import numpy as np
 from tqdm.autonotebook import tqdm
 from torch.optim.lr_scheduler import _LRScheduler
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-
 from packaging import version
 
 PYTORCH_VERSION = version.parse(torch.__version__)
@@ -412,6 +413,7 @@ class LRFinder(object):
         show_lr=None,
         ax=None,
         suggest_lr=True,
+        fig_name="",
     ):
         """Plots the learning rate range test.
 
@@ -431,6 +433,7 @@ class LRFinder(object):
             suggest_lr (bool, optional): suggest a learning rate by
                 - 'steepest': the point with steepest gradient (minimal gradient)
                 you can use that point as a first guess for an LR. Default: True.
+            fig_name (str): name of the figure. If it is given, save figure and not otherwise.
 
         Returns:
             The matplotlib.axes.Axes object that contains the plot,
@@ -441,8 +444,8 @@ class LRFinder(object):
             raise ValueError("skip_start cannot be negative")
         if skip_end < 0:
             raise ValueError("skip_end cannot be negative")
-        if show_lr is not None and not isinstance(show_lr, float):
-            raise ValueError("show_lr must be float")
+        if show_lr is not None and not isinstance(show_lr, (float, list)):
+            raise ValueError("show_lr must be float/list")
 
         # Get the data to plot from the history dictionary. Also, handle skip_end=0
         # properly so the behaviour is the expected
@@ -493,11 +496,19 @@ class LRFinder(object):
         ax.set_ylabel("Loss")
 
         if show_lr is not None:
-            ax.axvline(x=show_lr, color="red")
+            if isinstance(show_lr, float):
+                show_lr = [show_lr]
+            for lr in show_lr:
+                ax.axvline(x=lr, color="blue")
+
+        # Save figure if a fig name is given
+        if fig_name is not None:
+            plt.savefig(fig_name)
 
         # Show only if the figure was created internally
         if fig is not None:
             plt.show()
+        
 
         if suggest_lr and min_grad_idx:
             return ax, lrs[min_grad_idx]
