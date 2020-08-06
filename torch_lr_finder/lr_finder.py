@@ -424,7 +424,7 @@ class LRFinder(object):
                 Default: 5.
             log_lr (bool, optional): True to plot the learning rate in a logarithmic
                 scale; otherwise, plotted in a linear scale. Default: True.
-            show_lr (float, optional): if set, adds a vertical line to visualize the
+            show_lr (List, optional): if set, adds a vertical line to visualize the
                 specified learning rate. Default: None.
             ax (matplotlib.axes.Axes, optional): the plot is created in the specified
                 matplotlib axes object and the figure is not be shown. If `None`, then
@@ -514,7 +514,6 @@ class LRFinder(object):
             return ax, lrs[min_grad_idx]
         else:
             return ax
-
 
 class LinearLR(_LRScheduler):
     """Linearly increases the learning rate between two boundaries over a number of
